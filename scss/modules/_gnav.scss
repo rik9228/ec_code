@@ -1,0 +1,47 @@
+.nav-bottom {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  z-index: 20;
+  background-color: rgba(0, 0, 0, 0.8);
+
+  &__wrapper {
+    padding: 4em 20em;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__link,
+  &__text {
+    font-size: 16px;
+    color: #fff;
+  }
+
+  &__link {
+    border: 1px solid #fff;
+    padding: 1em;
+    transition: 0.4s;
+
+    &:hover {
+      background-color: #fff;
+      color: #000;
+    }
+
+    &--reset {
+      margin-right: 16px;
+    }
+  }
+
+  &__text {
+    margin-right: 40px;
+  }
+
+  &__sum {
+    padding: 1em;
+    background-color: #fff;
+    color: #000;
+    border-radius: 4px;
+    margin-left: 16px;
+  }
+}
