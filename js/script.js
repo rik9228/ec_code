@@ -22,20 +22,18 @@
     $buyButton.forEach((elem, index) => {
       for (let i = 0; i < ITEMS.length; i++) {
         if (ITEMS[i].id === index) {
-          elem.classList.add("js-active");
+          clicked.push(ITEMS[i].id);
+          saveItems.push(ITEMS[i]);
+          $buyButton[index].classList.add("js-active");
+          $buyButton[index].disabled = true;
           sumPrice = sumPrice + Number(elem.dataset.price);
           $bottomPrice.textContent = `¥${sumPrice}`;
         }
       }
     });
-
     // 購入点数の表示
     sumQuant = ITEMS.length;
     $bottomQuant.textContent = `${ITEMS.length}点`;
-
-    for (let i = 0; i < ITEMS.length; i++) {
-      saveItems.push(ITEMS[i]);
-    }
   }
 
   for (let i = 0; i < $buyButton.length; i++) {
@@ -50,8 +48,6 @@
       const tItemPrice = Number(e.target.dataset.price);
       const tItemName = e.target.dataset.name;
 
-      clicked.push(tItemIndex);
-
       //データ保存用の配列に商品データを追加
       saveItems.push({
         id: tItemIndex,
@@ -59,20 +55,91 @@
         price: tItemPrice,
       });
 
+      clicked.push(tItemIndex);
+
+      $buyButton[i].disabled = true;
+      $buyButton[i].classList.add("js-active");
+
       sumQuant++;
       sumPrice = sumPrice + tItemPrice;
       $bottomPrice.textContent = `¥${sumPrice}`;
       $bottomQuant.textContent = `${sumQuant}点`;
 
-      // クラス付与の処理
-      if (tItem.classList.contains("js-active")) {
+      localStorage.setItem("items", JSON.stringify(saveItems));
+    });
+  }
+
+  for (let i = 0; i < $delButton.length; i++) {
+    $delButton[i].addEventListener("click", (e) => {
+      const $prevButton = $delButton[i].previousElementSibling;
+      const eNum = Number(e.target.previousElementSibling.dataset.num);
+      const ePrice = Number(e.target.previousElementSibling.dataset.price);
+
+      deleteCount(ePrice);
+
+      if ($prevButton.disabled) {
+        $prevButton.disabled = false;
+        $prevButton.classList.remove("js-active");
+      }
+
+      console.log(eNum);
+
+      // //クリック管理用の配列から対象のボタンのindexを削除
+      for (let i = 0; i < clicked.length; i++) {
+        if (clicked[i] === eNum) {
+          // 対象の要素のi番がspliceの第１引数として使用される。
+          // 例：[1,2]
+          // 1(clicked[i]) === 1(eNum)
+          // i → 0;
+          // clicked.splice(0,1);
+          // savaItems.splice(0,1);
+
+          clicked.splice(i, 1);
+          saveItems.splice(i, 1);
+        }
+      }
+      localStorage.setItem("items", JSON.stringify(saveItems));
+    });
+  }
+  window.addEventListener("click", () => {
+    console.log(clicked);
+    console.log(saveItems);
+  });
+
+  // セレクトボックスの値を変えたとき
+  $select.addEventListener("change", (e) => {
+    sortItem(e);
+  });
+
+  // リセットボタンの処理
+  $resetButton.addEventListener("click", (e) => {
+    resetItem(e);
+  });
+
+  // 購入ボタンを押したとき
+  for (let i = 0; i < $confirm.length; i++) {
+    $confirm[i].addEventListener("click", (e) => {
+      if (saveItems.length === 0) {
+        e.preventDefault();
+        alert("カートに商品がありません");
       } else {
-        tItem.classList.add("js-active");
       }
     });
+  }
 
-    // セレクトボックスの値を変えたとき
-    $select.addEventListener("change", () => {
+  const deleteCount = (price) => {
+    sumQuant--;
+    sumPrice = sumPrice - price;
+    if (sumPrice < 0) {
+      sumPrice = 0;
+      return;
+    }
+    $bottomQuant.textContent = `${sumQuant}点`;
+    $bottomPrice.textContent = `¥${sumPrice}`;
+  };
+
+  const sortItem = (value) => {
+    for (let i = 0; i < $buyButton.length; i++) {
       const sValue = $select.value;
       if (sValue !== items[i].dataset.category) {
         // 選択値と一致しない商品にアクティブクラスを付与する
@@ -85,47 +152,10 @@
       if (sValue === "all") {
         items[i].parentNode.classList.remove("js-hidden");
       }
-    });
-  }
+    }
+  };
 
-  for (let i = 0; i < $delButton.length; i++) {
-    $delButton[i].addEventListener("click", (e) => {
-      const $prevButton = $delButton[i].previousElementSibling;
-      const eNum = Number(e.target.previousElementSibling.dataset.num);
-      const eName = e.target.previousElementSibling.dataset.name;
-      const ePrice = Number(e.target.previousElementSibling.dataset.price);
-
-      //クリック管理用の配列から対象のボタンのindexを削除
-      for (let i = 0; i < clicked.length; i++) {
-        if (clicked[i] === eNum) {
-          clicked.splice(i, 1);
-          // //データ保管ようの配列から対象の商品データを削除
-          saveItems.splice(i, 1);
-        }
-      }
-
-      console.log(saveItems);
-
-      // クラスの取り消し
-      $prevButton.classList.remove("js-active");
-
-      // 値段が0円のとき、合計金額を0円にして以降処理を行わない
-      if (sumPrice === 0) {
-        sumPrice = 0;
-        return;
-      }
-
-      sumQuant--;
-      sumPrice = sumPrice - ePrice;
-      $bottomQuant.textContent = `${sumQuant}点`;
-      $bottomPrice.textContent = `¥${sumPrice}`;
-
-      localStorage.setItem("items", JSON.stringify(saveItems));
-    });
-  }
-
-  // リセットボタンの処理
-  $resetButton.addEventListener("click", (e) => {
+  const resetItem = (e) => {
     e.preventDefault();
     for (let i = 0; i < items.length; i++) {
       items[i].classList.remove("js-active");
@@ -135,22 +165,10 @@
     $bottomPrice.textContent = `¥${sumPrice}`;
     $bottomQuant.textContent = `${sumQuant}点`;
     saveItems.length = 0;
-    localStorage.clear(); //全データを消去
+    localStorage.clear();
 
     $buyButton.forEach((elem) => {
       elem.disabled = false;
     });
-  });
-
-  // 購入ボタンを押したとき
-  for (let i = 0; i < $confirm.length; i++) {
-    $confirm[i].addEventListener("click", (e) => {
-      if (localStorage !== null) {
-        localStorage.setItem("items", JSON.stringify(saveItems));
-      } else {
-        e.preventDefault();
-        alert("カートに商品がありません");
-      }
-    });
-  }
+  };
 })();
