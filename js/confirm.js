@@ -6,6 +6,7 @@
   const $prevTop = document.getElementById("prevTop"); //DOMの追加処理用のフラグメント
 
   let saveItems = [];
+  let sumPrice = 0;
 
   if (ITEMS === null) {
     return;
@@ -15,8 +16,6 @@
   for (let i = 0; i < ITEMS.length; i++) {
     saveItems.push(ITEMS[i]);
   }
-
-  let sumPrice = 0;
 
   for (let i = 0; i < ITEMS.length; i++) {
     const tItemName = ITEMS[i].name;

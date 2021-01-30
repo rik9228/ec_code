@@ -82,8 +82,6 @@
         $prevButton.classList.remove("js-active");
       }
 
-      console.log(eNum);
-
       // //クリック管理用の配列から対象のボタンのindexを削除
       for (let i = 0; i < clicked.length; i++) {
         if (clicked[i] === eNum) {
@@ -101,10 +99,6 @@
       localStorage.setItem("items", JSON.stringify(saveItems));
     });
   }
-  window.addEventListener("click", () => {
-    console.log(clicked);
-    console.log(saveItems);
-  });
 
   // セレクトボックスの値を変えたとき
   $select.addEventListener("change", (e) => {
@@ -127,6 +121,7 @@
     });
   }
 
+  // 購入点数を減少する関数
   const deleteCount = (price) => {
     sumQuant--;
     sumPrice = sumPrice - price;
@@ -138,6 +133,7 @@
     $bottomPrice.textContent = `¥${sumPrice}`;
   };
 
+  // アイテムの並べ替え
   const sortItem = (value) => {
     for (let i = 0; i < $buyButton.length; i++) {
       const sValue = $select.value;
@@ -155,6 +151,7 @@
     }
   };
 
+  // アイテムをリセットさせる関数
   const resetItem = (e) => {
     e.preventDefault();
     for (let i = 0; i < items.length; i++) {
